@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geowind-era5"
+version = "0.1.0"
+description = "Geostrophic wind from ERA5 reanalysis via ARCO-ERA5 on Google Cloud Storage"
+requires-python = ">=3.10"
+dependencies = [
+    "xarray>=2022.6",
+    "zarr",
+    "gcsfs",
+    "dask",
+    "numpy",
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib"]
