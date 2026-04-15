@@ -47,12 +47,12 @@ axes[0].set_title("500 hPa Geopotential Height")
 
 # Zonal geostrophic wind
 ug0.plot(ax=axes[1], cmap="RdBu_r", vmin=-60, vmax=60,
-         cbar_kwargs={"label": "m s⁻¹"})
+         cbar_kwargs={"label": "m s-1"})
 axes[1].set_title("500 hPa Geostrophic $u_g$")
 
 # Meridional geostrophic wind
 vg0.plot(ax=axes[2], cmap="RdBu_r", vmin=-30, vmax=30,
-         cbar_kwargs={"label": "m s⁻¹"})
+         cbar_kwargs={"label": "m s-1"})
 axes[2].set_title("500 hPa Geostrophic $v_g$")
 
 # Overlay wind barbs (subsampled every 4th point for readability)

@@ -16,7 +16,6 @@ venv/
 
 # Jupyter
 .ipynb_checkpoints/
-*.ipynb
 
 # Generated outputs
 *.png

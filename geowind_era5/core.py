@@ -56,8 +56,8 @@ def open_geopotential(
         Pressure level(s) in hPa. Default ``500``.
         Available levels: 1–1000 hPa (37 levels).
     lat : float, (south, north), or slice, or None
-        Latitude selection.  Scalar → nearest grid point.  Tuple or slice →
-        bounding range.  ERA5 latitude runs 90 → −90; handled internally.
+        Latitude selection.  Scalar --> nearest grid point.  Tuple or slice -->
+        bounding range.  ERA5 latitude runs 90 --> −90; handled internally.
     lon : float, (west, east), or slice, or None
         Longitude. Negative  W values accepted and converted to 0–360.
 
@@ -107,7 +107,7 @@ def geostrophic_wind(
     phi : xr.DataArray
         Geopotential in m2 s -2 with **latitude** and **longitude** dimensions.
         Must cover a spatial region — a single grid point returns NaN.
-        Not physically valid within ~5  of the equator (f → 0).
+        Not physically valid within ~5  of the equator (f --> 0).
 
     Returns
     -------
@@ -128,8 +128,8 @@ def geostrophic_wind(
     f = 2.0 * _OMEGA * np.sin(lat_rad)  # Coriolis parameter (s-1)
 
     # --- meridional gradient ------------------------------------------------
-    # differentiate("latitude") → dphi/dlat in m2 s -2 per degree
-    # × (pi/180) converts degrees→radians; ÷ _A converts arc→metres
+    # differentiate("latitude") --> dphi/dlat in m2 s -2 per degree
+    # × (pi/180) converts degrees-->radians; ÷ _A converts arc-->metres
     dPhi_dlat = phi.differentiate("latitude")
     dPhi_dy = dPhi_dlat * (np.pi / 180.0) / _A          # per metre (northward)
 

@@ -13,6 +13,7 @@ dependencies = [
     "gcsfs",
     "dask",
     "numpy",
+    "netCDF4",
 ]
 
 [project.optional-dependencies]

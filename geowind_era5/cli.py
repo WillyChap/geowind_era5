@@ -71,4 +71,4 @@ def main() -> None:
         attrs={"level_hPa": args.level, "source": "ARCO-ERA5"},
     )
     ds.to_netcdf(args.output)
-    print(f"Saved → {args.output}")
+    print(f"Saved --> {args.output}")
