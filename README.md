@@ -129,7 +129,27 @@ ERA5 has 37 pressure levels (hPa):
 
 ---
 
-## Example
+## Command-line interface
+
+After installation a `geowind` command is available:
+
+```bash
+# 500 hPa geostrophic wind over the CONUS, 1 Jan 2010
+geowind --level 500 --lat 20 60 --lon -135 -60 --time 2010-01-01 2010-01-01
+
+# 250 hPa jet stream, multi-day, custom output file
+geowind --level 250 --lat 30 70 --lon -180 -60 \
+        --time 2020-02-01 2020-02-03 -o jetstream.nc
+
+# Help
+geowind --help
+```
+
+Output is a NetCDF file containing `geopotential`, `ug`, and `vg`.
+
+---
+
+## Example script
 
 ```bash
 python examples/geowind_500hPa.py
