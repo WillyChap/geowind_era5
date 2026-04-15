@@ -16,7 +16,7 @@ phi = open_geopotential(
     time_slice=("2010-01-01", "2010-01-01"),
     level=500,
     lat=(20.0, 60.0),
-    lon=(-135.0, -60.0),   # negative °W fine; converted to 0–360 internally
+    lon=(-135.0, -60.0),   # negative  W fine; converted to 0–360 internally
 )
 
 print("Lazy geopotential DataArray:")
@@ -40,7 +40,7 @@ print(f"  v_g: {float(vg0.min()):.1f} to {float(vg0.max()):.1f} m/s")
 # 5. Plot
 fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
-# Geopotential height (Z = Φ/g)
+# Geopotential height (Z =  phi/g)
 Z = phi0 / 9.80665
 Z.plot(ax=axes[0], cmap="viridis", cbar_kwargs={"label": "Z (m)"})
 axes[0].set_title("500 hPa Geopotential Height")
@@ -57,7 +57,7 @@ axes[2].set_title("500 hPa Geostrophic $v_g$")
 
 # Overlay wind barbs (subsampled every 4th point for readability)
 lat = phi0.latitude.values
-lon = phi0.longitude.values - 360  # shift to negative °W for labelling
+lon = phi0.longitude.values - 360  # shift to negative  W for labelling
 LON, LAT = np.meshgrid(lon, lat)
 step = 4
 

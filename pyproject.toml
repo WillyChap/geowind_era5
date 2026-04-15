@@ -17,3 +17,6 @@ dependencies = [
 
 [project.optional-dependencies]
 plot = ["matplotlib"]
+
+[project.scripts]
+geowind = "geowind_era5.cli:main"
