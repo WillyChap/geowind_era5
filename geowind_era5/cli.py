@@ -53,7 +53,7 @@ def main() -> None:
     lat = tuple(args.lat) if args.lat else None
     lon = tuple(args.lon) if args.lon else None
 
-    print(f"Opening ERA5 geopotential — {args.level} hPa  {args.time[0]} → {args.time[1]}")
+    print(f"Opening ERA5 geopotential — {args.level} hPa  {args.time[0]} --> {args.time[1]}")
     phi = open_geopotential(
         time_slice=tuple(args.time),
         level=args.level,

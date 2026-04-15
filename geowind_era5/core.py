@@ -84,6 +84,12 @@ def open_geopotential(
     da = da.sel(time=slice(*time_slice))
     da = da.sel(level=level)
     da = _sel_spatial(da, lat, lon)
+    # Re-chunk so each Dask task is small: the native zarr chunks bundle all
+    # 37 pressure levels together (~147 MB uncompressed per time step).
+    # After the level selection above that dimension is gone, but zarr still
+    # has to decompress the full chunk.  Splitting spatially here ensures that
+    # compute() never holds more than a few hundred MB at once.
+    da = da.chunk({"time": 1, "latitude": 181, "longitude": 360})
     return da
 
 
@@ -194,12 +200,21 @@ def _sel_spatial(da: xr.DataArray, lat, lon) -> xr.DataArray:
         if np.isscalar(lon):
             da = da.sel(longitude=float(lon) % 360, method="nearest")
         elif isinstance(lon, slice):
-            start = float(lon.start) % 360 if lon.start is not None else None
-            stop = float(lon.stop) % 360 if lon.stop is not None else None
-            lo, hi = sorted([start, stop])
-            da = da.sel(longitude=slice(lo, hi))
+            lo_raw = float(lon.start) if lon.start is not None else -180.0
+            hi_raw = float(lon.stop) if lon.stop is not None else 180.0
+            if abs(hi_raw - lo_raw) < 360.0:
+                lo = lo_raw % 360
+                hi = hi_raw % 360
+                lo, hi = sorted([lo, hi])
+                da = da.sel(longitude=slice(lo, hi))
+            # else: span is global, skip subsetting
         else:
-            lo, hi = sorted(float(v) % 360 for v in lon)
-            da = da.sel(longitude=slice(lo, hi))
+            lo_raw, hi_raw = float(lon[0]), float(lon[1])
+            if abs(hi_raw - lo_raw) < 360.0:
+                lo = lo_raw % 360
+                hi = hi_raw % 360
+                lo, hi = sorted([lo, hi])
+                da = da.sel(longitude=slice(lo, hi))
+            # else: span is global (-180→180 or 0→360), skip subsetting
 
     return da
