@@ -198,23 +198,47 @@ def _sel_spatial(da: xr.DataArray, lat, lon) -> xr.DataArray:
 
     if lon is not None:
         if np.isscalar(lon):
-            da = da.sel(longitude=float(lon) % 360, method="nearest")
+            da = da.sel(longitude=_to_360(float(lon)), method="nearest")
         elif isinstance(lon, slice):
             lo_raw = float(lon.start) if lon.start is not None else -180.0
             hi_raw = float(lon.stop) if lon.stop is not None else 180.0
-            if abs(hi_raw - lo_raw) < 360.0:
-                lo = lo_raw % 360
-                hi = hi_raw % 360
-                lo, hi = sorted([lo, hi])
-                da = da.sel(longitude=slice(lo, hi))
-            # else: span is global, skip subsetting
+            da = _sel_lon(da, lo_raw, hi_raw, dim="longitude")
         else:
-            lo_raw, hi_raw = float(lon[0]), float(lon[1])
-            if abs(hi_raw - lo_raw) < 360.0:
-                lo = lo_raw % 360
-                hi = hi_raw % 360
-                lo, hi = sorted([lo, hi])
-                da = da.sel(longitude=slice(lo, hi))
-            # else: span is global (-180→180 or 0→360), skip subsetting
+            da = _sel_lon(da, float(lon[0]), float(lon[1]), dim="longitude")
 
     return da
+
+
+def _to_360(v: float) -> float:
+    """Normalize a longitude to 0–360 range.
+
+    Negative values (°W) are shifted by +360.  Positive values — including
+    360 itself — are left unchanged so that ``--lon 1 360`` stays as 1→360
+    rather than collapsing to 1→0 via ``360 % 360``.
+    """
+    return v + 360 if v < 0 else v
+
+
+def _sel_lon(da: xr.DataArray, lo_raw: float, hi_raw: float, dim: str) -> xr.DataArray:
+    """Select a longitude range on a 0–360 grid, handling wraparound correctly.
+
+    Cases
+    -----
+    - span >= 360°  : global — return da unchanged
+    - lo <= hi      : normal slice, e.g. -135→-60 becomes 225→300
+    - lo > hi       : range crosses the prime meridian, e.g. -179→179 becomes
+                      181→179; concat [181,360) + [0,179]
+    """
+    if abs(hi_raw - lo_raw) >= 360.0:
+        return da  # global — no subsetting needed
+
+    lo = _to_360(lo_raw)
+    hi = _to_360(hi_raw)
+
+    if lo <= hi:
+        return da.sel({dim: slice(lo, hi)})
+
+    # Wraparound: e.g. lo=181, hi=179 → [181,360) ∪ [0,179]
+    part1 = da.sel({dim: slice(lo, None)})
+    part2 = da.sel({dim: slice(None, hi)})
+    return xr.concat([part1, part2], dim=dim)
